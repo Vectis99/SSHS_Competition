@@ -1,7 +1,7 @@
 ﻿using System;
 using SouthSaxon;
 
-namespace Debug
+namespace TestProgram
 {
     public class Program
     {
@@ -12,6 +12,8 @@ namespace Debug
             string pattern = IO.ReadString("Input the search pattern: ");
             Console.WriteLine("Found: " +  IO.ValidateInputItem(target, pattern));
             Console.ReadLine();
+
+            //This comment is an example change to test commits: Everything's working!
 
             //Find example problems:
             //https://drive.google.com/drive/folders/0B3jUhu-NdWs0ZGZ1WHJoYkhmRVU
