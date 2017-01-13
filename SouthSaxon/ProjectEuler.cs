@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace SouthSaxon
 {
-    //TODO Add a git repository: See the solution browser on the write? Below it are these little tabs.
     public class ProjectEuler
     {
         /// <summary>
@@ -39,5 +38,7 @@ namespace SouthSaxon
                 i++;
             }
         }
+
+        //Add more functions here.
     }
 }
