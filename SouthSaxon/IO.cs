@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SouthSaxon
@@ -30,11 +31,6 @@ namespace SouthSaxon
                     return backup;
             }
         }
-        
-        /*
-         * NUMBERS
-         * Only ReadInt tested
-         */
 
         /// <summary>
         /// Gets a single numerical input from the user.
@@ -219,22 +215,74 @@ namespace SouthSaxon
             return System.Text.RegularExpressions.Regex.IsMatch(item, regex);
          }
 
-         /*
-          * TRIMMERS
-          * Remove unwanted clutter!
-          */
-         public static string Trim(string toTrim)
+        /*
+         * OTHER
+         */
+
+        /// <summary>
+        /// Removes unwanted characters from a string.
+        /// string.Replace() isn't used because you can't replace things without leaving an empty space in the string
+        /// </summary>
+        /// <param name="toTrim">The string to remove characters from</param>
+        /// <param name="blacklist">A string containing an instance of every character to remove</param>
+        /// <returns>A string without any of the blacklisted characters</returns>
+        public static string Trim(string toTrim, string blacklist)
          {
-            throw (new Exception("This function doesn't work."));
+            string trimmed = ""; 
+            foreach(char c in toTrim)
+            {
+                foreach(char k in blacklist)
+                {
+                    if (c != k)
+                        trimmed += c;
+                }
+            }
+            return trimmed;
          }
+
+        /// <summary>
+        /// Tests a string against a regular expression.
+        /// </summary>
+        /// <seealso cref="RegexReference"/>
+        /// <param name="input">The string to inspect</param>
+        /// <param name="expression">The regular expression by which to evaluate the string</param>
+        /// <param name="matchAmountMin">The minimum number of matches to accept (optional)</param>
+        /// <param name="matchAmountMax">The maximum number of matches to accept (optional)</param>
+        /// <returns></returns>
+        public static bool TestExpression(string input, string expression, int matchAmountMin = -1, int matchAmountMax = -1)
+        {
+            Regex expressionToTest = new Regex(expression);
+            MatchCollection matches = expressionToTest.Matches(input);
+            int numberOfMatches = matches.Count;
+            if((matchAmountMin < 0|| matchAmountMax < 0) && numberOfMatches > 0)
+            {
+                return true;
+            }
+            else if ( numberOfMatches >= matchAmountMin && numberOfMatches <= matchAmountMax) //Yeah they're inclusive
+            {
+                return true;
+            }
+            return false;
+        }
 
     }
 
     /// <summary>
     /// For the lazy among us
     /// </summary>
-    public enum RegexReference
+    public static class RegexReference
     {
         //TODO fill this up with commmon regular expressions which might make sense on the competition.
+        // All \ charactars will be replaced by \\ because of escaping.
+        public static string LETTERS = "([A-Z]|[a-z])+";
+        public static string NUMBERS = "([0-9]*\\.[0-9]+)|([0-9]+)";
+        public static string INTEGER = "[0-9]+";
+        public static string HEX = "#?((([a,A,b,B,c,C,d,D,e,E,f,F]|[0-9])*\\.([a,A,b,B,c,C,d,D,e,E,f,F]|[0-9])+)|([a,A,b,B,c,C,d,D,e,E,f,F]|[0-9])+)"; //This is a horrible regular expression, but it works. You can condense it if you want.
+        public static string BINARY = "[1,0]+";
+        public static string MATH_OPERATOR_SIMPLE = "[+,\\-,*,/,(,)]";
+        public static string MATH_OPERATOR_ALL = "[+,\\-,*,/,(,),^,%]";
+        public static string MATH_OPERATION = "([+,\\-,*,/,(,),^,%]|([0-9]*\\.[0-9]+)|([0-9]+))+";
+        public static string PRECURSOR_TOKEN = "([A-Z]|[a-z]){1}[0-9]+";
+        public static string POSTCURSOR_TOKEN = "[0-9]+([A-Z]|[a-z]){1}"; //I don't think postcursor is a word but don't tell anyone.
     }
 }

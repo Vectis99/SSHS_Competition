@@ -39,6 +39,23 @@ namespace SouthSaxon
             }
         }
 
+       /* public static int PowerDigitSum()
+        {
+            int intVersion = (int)Math.Pow(2, 25);
+            string stringVersion = intVersion.ToString();
+            string digits = ""; //Funnily enough, this will end up reading backwards
+            int carryOver = 0;
+
+
+
+            for (int i = 0; i < stringVersion.Length; i++)
+            {
+                intVersion += carryOver;//[0-9]*\.[0-9]*
+                stringVersion.Reverse();
+            }
+             
+        }*/
+
         //Add more functions here.
     }
 }
