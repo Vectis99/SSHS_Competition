@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseConverter.cs" />
+    <Compile Include="Geometry\Shapes.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="ProjectEuler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
