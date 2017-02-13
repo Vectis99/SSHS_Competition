@@ -49,15 +49,14 @@ namespace SouthSaxon.Geometry
         }
 
         //TEST THIS!!! This function will become very important when constructing reflect methods for all of the other entities.
-        public void reflect(Line mirror)
+        public Point Reflect(Line mirror)
         {
             double invertSlope = 1 / -mirror.Slope;
             Line trace = new Line(this, invertSlope);
             Point midway = trace.Intersect(mirror);
             double xDistance = 2*(midway.X - X);
             double yDistance = 2*(midway.Y - Y);
-            X += xDistance;
-            Y += yDistance;
+            return new Point(X + xDistance, Y + yDistance);
         }
 
         //I don't think this meets conventions for writing equals object. A link to these conventions is listed when you type Equals and tab twice (which inserts the code snippit)
@@ -88,6 +87,7 @@ namespace SouthSaxon.Geometry
     }
 
     /*Add a "below line" and "above line" function; that will come in handy for triangles!*/
+    /*Also add reflect functions for these*/
 
     /// <summary>
     /// A simple, straight line.
@@ -387,7 +387,7 @@ namespace SouthSaxon.Geometry
         {
             double width = p2.X - p1.X;
             double height = p2.Y - p1.Y;
-            return Math.Sqrt((width * width) * (height * height));
+            return Math.Sqrt((width * width) + (height * height));
         }
 
         /// <summary>
@@ -479,12 +479,112 @@ namespace SouthSaxon.Geometry
      Circle Class
      Rectangle Class
      Triangle Class
+     X-Sided Shape class...
      For these there, add functions for area, angles, transformations, and etcetera. Should be a fairly good sized project.
      Don't forget that everything you do should be constructed out of points! That way, you can do transformations such as reflections easily.
      */
 
     public abstract class Shape
     {
-        //Fill in this stuff later. Will include area, liesWithin (can use on points or other shapes)
+        /// <summary>
+        /// Returns the area of the shape in units^2
+        /// </summary>
+        /// <returns>The shape's area</returns>
+        public abstract double Area();
+        /// <summary>
+        /// Reflects a shape
+        /// </summary>
+        /// <param name="mirror">The line to reflect the shape over</param>
+        /// <returns>A reflected version of the shape</returns>
+        public abstract Shape Reflect(Line mirror);
+        /// <summary>
+        /// Rotates a point a certain amount around a point.
+        /// </summary>
+        /// <param name="origin">The point to rotate the shape around.</param>
+        /// <param name="radians">The amount by which to rotate the shape, starting with 0 = right and moving counter-clockwise</param>
+        /// <returns>A rotated version of the shape</returns>
+        public abstract Shape Rotate(Point origin, double radians); //Maybe this should use the circle class?
+        /// <summary>
+        /// Checks to see if a point falls within a shape's boundries.
+        /// </summary>
+        /// <param name="point">The point to examine in relation to this shape</param>
+        /// <returns>True if the point lies within the shape's perimeter</returns>
+        public abstract bool PointLiesWithin(Point point);
+        /// <summary>
+        /// Checks to see if a point is on the perimeter of the shape
+        /// </summary>
+        /// <param name="point">The point to examine in relation to this shape</param>
+        /// <returns>Whether or not the point is exactly on the shape's perimeter</returns>
+        public abstract bool PointLiesOn(Point point);
     }
+
+    public class Circle : Shape
+    {
+        private Point center;
+        private double radius;
+
+        public Point Center
+        {
+            get
+            {
+                return center;
+            }
+
+            set
+            {
+                center = value;
+            }
+        }
+
+        public double Radius
+        {
+            get
+            {
+                return radius;
+            }
+
+            set
+            {
+                radius = value;
+            }
+        }
+
+        public Circle(Point p, double rad = 1)
+        {
+            Center = p;
+            Radius = rad;
+        }
+
+        public Circle(double rad = 1) : this(new Point(), rad) { }
+
+        public override double Area()
+        {
+            return Math.PI * Math.Pow(Radius, 2);
+        }
+
+        public override Shape Reflect(Line mirror)
+        {
+            return new Circle(Center.Reflect(mirror), Radius);
+        }
+
+        public override Shape Rotate(Point origin, double radians)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool PointLiesWithin(Point point)
+        {
+            LineSegment distance = new LineSegment(Center, point);
+            if (distance.Measure() < Radius)
+                return true;
+            else
+                return false;
+        }
+
+        public override bool PointLiesOn(Point point)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }
