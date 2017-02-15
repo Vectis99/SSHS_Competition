@@ -59,6 +59,17 @@ namespace SouthSaxon.Geometry
             return new Point(X + xDistance, Y + yDistance);
         }
 
+        public Point Rotate(Point origin, double radians)
+        {
+            //Translate it to focus it on (0,0) since that makes things a little easier.
+            double translatedX = X - origin.X;
+            double translatedY = Y - origin.Y;
+            double translatedRotatedX = (translatedX * Math.Cos(radians)) - (translatedY * Math.Sin(radians));
+            double translatedRotatedY = (translatedX * Math.Sin(radians)) + (translatedY * Math.Cos(radians));
+            return new Point(translatedRotatedX + origin.X, translatedRotatedY + origin.y);
+
+        }
+
         //I don't think this meets conventions for writing equals object. A link to these conventions is listed when you type Equals and tab twice (which inserts the code snippit)
         /// <summary>
         /// Checks to see if another point is the same as this one.
@@ -585,6 +596,13 @@ namespace SouthSaxon.Geometry
         {
             throw new NotImplementedException();
         }
+
+        /* ROTATION DICTIONARY */
+        public const double HALF = Math.PI; //180 degrees
+        public const double THIRD = (2 * Math.PI) / 3; //120 degrees
+        public const double QUARTER = Math.PI / 2; //90 degrees
+        public const double SIXTH = Math.PI / 3; //60 degrees
+        public const double EIGTH = Math.PI / 4; //45 degrees
     }
 
 }
