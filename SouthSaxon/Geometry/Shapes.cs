@@ -59,6 +59,12 @@ namespace SouthSaxon.Geometry
             return new Point(X + xDistance, Y + yDistance);
         }
 
+        /// <summary>
+        /// Rotates a point a certain amount around another point. Beware, for sometimes this function returns a number which is an extremely small amount off due to rounding shenanigans.
+        /// </summary>
+        /// <param name="origin">The fixed point to rotate this point around.</param>
+        /// <param name="radians">The amount by which to rotate the point, starting with 0 = right and moving counter-clockwise</param>
+        /// <returns>A point representing where this point would be if it were rotated.</returns>
         public Point Rotate(Point origin, double radians)
         {
             //Translate it to focus it on (0,0) since that makes things a little easier.
@@ -193,6 +199,17 @@ namespace SouthSaxon.Geometry
             }
             else
                 return new Point(double.NaN, double.NaN);
+        }
+
+        public Point Trace(double startX = 0, double distance) 
+        {
+            //I've stared at this for like 15 minutes and I'm drawing a blank. This is getting absurd
+            //distance^2 = change in x^2 + change in y^2
+            //change in y = slope * change in x
+            //distance^2 = (changeInX^2) + (slope*changeInX)^2
+            //where do I go from here...
+
+
         }
     }
 
@@ -495,6 +512,9 @@ namespace SouthSaxon.Geometry
      Don't forget that everything you do should be constructed out of points! That way, you can do transformations such as reflections easily.
      */
 
+    /// <summary>
+    /// A fully enclosed shape.
+    /// </summary>
     public abstract class Shape
     {
         /// <summary>
@@ -509,7 +529,7 @@ namespace SouthSaxon.Geometry
         /// <returns>A reflected version of the shape</returns>
         public abstract Shape Reflect(Line mirror);
         /// <summary>
-        /// Rotates a point a certain amount around a point.
+        /// Rotates a shape a certain amount around a point. Beware, for sometimes this function returns a number which is an extremely small amount off due to rounding shenanigans.
         /// </summary>
         /// <param name="origin">The point to rotate the shape around.</param>
         /// <param name="radians">The amount by which to rotate the shape, starting with 0 = right and moving counter-clockwise</param>
@@ -527,6 +547,49 @@ namespace SouthSaxon.Geometry
         /// <param name="point">The point to examine in relation to this shape</param>
         /// <returns>Whether or not the point is exactly on the shape's perimeter</returns>
         public abstract bool PointLiesOn(Point point);
+
+        public abstract Point[] Intersections(Line intersector);
+
+        public abstract Point[] Intersections(Shape intersectors);
+    }
+
+    /// <summary>
+    /// A fully enclosed shape shape with three or more sides.
+    /// </summary>
+    public abstract class Polygon : Shape
+    {
+        private Point[] corners;
+
+        /// <summary>
+        /// The number of corners, or sides, in a polygon.
+        /// </summary>
+        /// <returns>The number of corners, or sides, in a shape.</returns>
+        public int sides()
+        {
+            return corners.Length;
+        }
+
+        /// <summary>
+        /// Returns the line segments which make up the polygon's perimeter
+        /// </summary>
+        /// <returns></returns>
+        private Line[] LineConnectors()
+        {
+            Line[] borders = new Line[sides()];
+            for(int i = 0; i < sides() - 1; i++)
+            {
+                borders[i] = new LineSegment(corners[i], corners[i+1]);
+            }
+            borders[sides() - 1] = new LineSegment(corners[0], corners[sides() - 1]);
+            return borders;
+        }
+
+        public int InteriorAngleSum()
+        {
+            return 180 * (sides() - 2);
+        }
+
+        //InteriorAngle() is not necessarily a good thing to mandate because not all shapes will be equalateral
     }
 
     public class Circle : Shape
@@ -568,21 +631,41 @@ namespace SouthSaxon.Geometry
 
         public Circle(double rad = 1) : this(new Point(), rad) { }
 
+        /// <summary>
+        /// Returns the area of the circle in units^2
+        /// </summary>
+        /// <returns>The circle's area</returns>
         public override double Area()
         {
             return Math.PI * Math.Pow(Radius, 2);
         }
 
+        /// <summary>
+        /// Reflects a circle
+        /// </summary>
+        /// <param name="mirror">The line to reflect the circle over</param>
+        /// <returns>A reflected version of the circle</returns>
         public override Shape Reflect(Line mirror)
         {
             return new Circle(Center.Reflect(mirror), Radius);
         }
 
+        /// <summary>
+        /// Rotates a circle a certain amount around a point. Beware, for sometimes this function returns a circle which is an extremely small amount off due to rounding shenanigans.
+        /// </summary>
+        /// <param name="origin">The point to rotate the circle around.</param>
+        /// <param name="radians">The amount by which to rotate the circle, starting with 0 = right and moving counter-clockwise</param>
+        /// <returns>A rotated version of the circle</returns>
         public override Shape Rotate(Point origin, double radians)
         {
-            throw new NotImplementedException();
+            return new Circle(center.Rotate(origin, radians), Radius);
         }
 
+        /// <summary>
+        /// Checks to see if a point falls within this circle's boundries.
+        /// </summary>
+        /// <param name="point">The point to examine in relation to this circle</param>
+        /// <returns>True if the point lies within the shape's perimeter</returns>
         public override bool PointLiesWithin(Point point)
         {
             LineSegment distance = new LineSegment(Center, point);
@@ -592,8 +675,45 @@ namespace SouthSaxon.Geometry
                 return false;
         }
 
+        /// <summary>
+        /// Checks to see if a point is on the circumference of the circle
+        /// </summary>
+        /// <param name="point">The point to examine in relation to this circle</param>
+        /// <returns>Whether or not the point is exactly on the circle's perimeter</returns>
         public override bool PointLiesOn(Point point)
         {
+            LineSegment distance = new LineSegment(Center, point);
+            if (distance.Measure() == Radius)
+                return true;
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// ASDJIFOASOIJOIFWAEOINROPAWIJEROPINROWAEIN!!! I dunno how to do this. I'll get to it later.
+        /// </summary>
+        /// <param name="intersector">The line to check for intersections with</param>
+        /// <returns>The points of intersection</returns>
+        public override Point[] Intersections(Line intersector)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Point[] Intersections(Shape intersector)
+        {
+            if(intersector.GetType() == typeof(Circle))
+            {
+                Circle other = (Circle)intersector;
+                LineSegment distanceBetweenPoints = new LineSegment(center, other.Center);
+                if (distanceBetweenPoints.Measure() < (Radius + other.Radius))
+                {
+                    return new Point[0]; //There aren't any intersections
+                }
+                else if(distanceBetweenPoints.Measure() == (Radius + other.Radius))
+                {
+
+                }
+            }
             throw new NotImplementedException();
         }
 
