@@ -34,11 +34,13 @@ namespace TestProgram
                 }
             }*/
             Point point1 = new Point(2, 2);
-            Point point2 = new Point(1, 1);
-            double angle = Circle.QUARTER + Circle.HALF;
-            Console.WriteLine("Rotating " + point1 + " about " + point2 + " " + angle + " radians.");
-            Console.WriteLine(point1.Rotate(point2, angle));
-            
+            Point point2 = new Corner(1, 1);
+            Corner corner1 = new Corner(3,3, Circle.QUARTER + Circle.HALF);
+            Line mirror = new Line(2, 0);
+            Console.WriteLine(point1.Reflect(mirror));
+            Console.WriteLine(point2.Reflect(mirror));
+            Console.WriteLine(corner1.Reflect(mirror));
+
             Console.ReadLine();
 
             
