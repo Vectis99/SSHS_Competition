@@ -101,6 +101,15 @@ namespace SouthSaxon.Geometry
             return "(" + X + "," + Y + ")";
         }
 
+        public bool IsWorkablePoint()
+        {
+            bool xCheck = X == double.NaN || double.IsInfinity(X);
+            bool yCheck = X == double.NaN || double.IsInfinity(Y);
+            if(xCheck || yCheck)
+                return false;
+            return true;
+        }
+
     }
 
     /// <summary>
@@ -250,6 +259,11 @@ namespace SouthSaxon.Geometry
                 return false;
         }
 
+        /// <summary>
+        /// Determines where this straight line and another touch each other.
+        /// </summary>
+        /// <param name="other">The line to collide with this one.</param>
+        /// <returns>The point of intersection, if the two lines cross. If the lines touch each other, returns a point infinite values, or NaN if they never touch.</returns>
         public Point Intersect(Line other)
         {
             //y = mx + b = nx + c

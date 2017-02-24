@@ -41,11 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseConverter.cs" />
-    <Compile Include="Geometry\GeoBasic.cs" />
-    <Compile Include="Geometry\Shapes.cs" />
+    <Compile Include="geometry\GeoBasic.cs" />
+    <Compile Include="geometry\Shapes.cs" />
     <Compile Include="IO.cs" />
     <Compile Include="ProjectEuler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sorts.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

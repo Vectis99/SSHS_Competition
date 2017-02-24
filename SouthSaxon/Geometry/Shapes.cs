@@ -49,7 +49,7 @@ namespace SouthSaxon.Geometry
         public abstract Point[] Intersections(Shape intersector);
     }
 
-    public class Circle : Shape
+    public class Circle : Shape // I know that this should be an extension of ellipse but I can't figure those things out for the life of me.
     {
         private Point center;
         private double radius;
@@ -236,21 +236,6 @@ namespace SouthSaxon.Geometry
             return corners.Length;
         }
 
-        public bool LiesWithin(Point point)
-        {
-            // [Outside] | [Inside] | [Outside]
-            Line insideOutsideFlipper = new Line(0, point.Y);
-            List < Point > flips = new List<Point>();
-            Line[] boundries = LineConnectors();
-            for (int i = 0; i < sides(); i++)
-            {
-                Point intersection = new 
-                flips.Add(insideOutsideFlipper.Intersect(boundries[i]));
-
-                //TODO http://alienryderflex.com/polygon/
-            }
-        }
-
         /// <summary>
         /// Returns the line segments which make up the polygon's perimeter
         /// </summary>
@@ -266,6 +251,88 @@ namespace SouthSaxon.Geometry
             return borders;
         }
 
+        /// <summary>
+        /// Determines whether a given point is within the polygon
+        /// </summary>
+        /// <param name="point">See if this point is inside of the </param>
+        /// <returns><c>true</c> if the point lies within the polygon (not on the polygon!)</returns>
+        public override bool LiesWithin(Point point)
+        {
+            // [Outside] | [Inside] | [Outside]
+            Line insideOutsideFlipper = new Line(0, point.Y);
+            List<Point> flips = new List<Point>();
+            Line[] boundries = LineConnectors();
+            for (int i = 0; i < sides(); i++)
+            {
+                Point intersection = insideOutsideFlipper.Intersect(boundries[i]);
+                if (intersection.IsWorkablePoint())
+                    flips.Add(intersection);
+            }
+            for (int i = 0; i < flips.Count - 1; i++)
+            {
+                if (flips[i].X < point.X && flips[i + 1].X > point.X)
+                {// If we are between two points
+                    if (i % 2 == 1)
+                    {// If the point to the left of us is an odd indexed point, then we are on the inside; otherwise, we are on the outside.
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether a point falls on the perimeter of a polygon
+        /// </summary>
+        /// <param name="point">The point to examine in relation to the polygon</param>
+        /// <returns><c>true</c> if the point is exactly on the border of the shape.</returns>
+        public override bool LiesOn(Point point)
+        {
+            foreach (Line border in LineConnectors())
+            {
+                if (border.OnLine(point))
+                    return true;
+            }
+            return false;
+        }
+
+        public override Point[] Intersections(Shape intersector)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Finds all of the points at which shapes touch each other.
+        /// Be wary! Points with infinite values mean that the shapes never actually crossed each other, but they were exactly touching!
+        /// </summary>
+        /// <param name="intersector">The line to cross through this polygon</param>
+        /// <param name="recordInfiniteIntersection">Whether or not to return a placeholder point with NaN for values when there is no intersection between a border and the line.</param>
+        /// <param name="recordNoIntersection">Whether or not to return a placeholder point to represent perfectly adjacent parallel lines.</param>
+        /// <returns>All of the intersections between this shape and the line.</returns>
+        public Point[] Intersections(Line intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
+        {
+            Line[] myBorders = LineConnectors();
+            List<Point> intersectionPoints = new List<Point>();
+            for (int i = 0; i < myBorders.Length; i++)
+            {
+                Point currentDummy = myBorders[i].Intersect(intersector);
+                if (!(double.IsNaN(currentDummy.X) || double.IsNaN(currentDummy.Y)) || recordNoIntersection)
+                { //If they aren't the same line (you can succeed anyway if we've been told not to check for this)
+                    if (!(double.IsInfinity(currentDummy.X) || double.IsInfinity(currentDummy.Y)) || recordInfiniteIntersection)
+                    { //If they aren't the same line (you can succeed anyway if we've been told not to check for this)
+                        intersectionPoints.Add(currentDummy);
+                    }
+                }
+            }
+            return intersectionPoints.ToArray();
+        }
+
+        /// <see cref="Intersections(Line, bool, bool)"/>
+        public override Point[] Intersections(Line intersector)
+        {
+            return Intersections(intersector, true, false);
+        }
+
         public int InteriorAngleSum()
         {
             return 180 * (sides() - 2);
@@ -274,29 +341,10 @@ namespace SouthSaxon.Geometry
         //InteriorAngle() is not necessarily a good thing to mandate because not all shapes will be equalateral
     }
 
+    //TODO: Add trigonometry to the triangle class!
     public class Triangle : Polygon
     {
         public override double Area()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Point[] Intersections(Shape intersector)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Point[] Intersections(Line intersector)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool LiesOn(Point point)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool LiesWithin(Point point)
         {
             throw new NotImplementedException();
         }
@@ -315,26 +363,6 @@ namespace SouthSaxon.Geometry
     public class Quadrilateral : Polygon
     {
         public override double Area()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Point[] Intersections(Shape intersector)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Point[] Intersections(Line intersector)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool LiesOn(Point point)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool LiesWithin(Point point)
         {
             throw new NotImplementedException();
         }
