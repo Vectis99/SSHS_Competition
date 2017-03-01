@@ -44,9 +44,9 @@ namespace SouthSaxon.Geometry
         /// <returns>Whether or not the point is exactly on the shape's perimeter</returns>
         public abstract bool LiesOn(Point point);
 
-        public abstract Point[] Intersections(Line intersector);
+        public abstract Point[] Intersections(Line intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false);
 
-        public abstract Point[] Intersections(Shape intersector);
+        public abstract Point[] Intersections(Shape intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false);
     }
 
     public class Circle : Shape // I know that this should be an extension of ellipse but I can't figure those things out for the life of me.
@@ -151,12 +151,12 @@ namespace SouthSaxon.Geometry
         /// </summary>
         /// <param name="intersector">The line to check for intersections with</param>
         /// <returns>The points of intersection</returns>
-        public override Point[] Intersections(Line intersector)
+        public override Point[] Intersections(Line intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
         {
             throw new NotImplementedException();
         }
 
-        public override Point[] Intersections(Shape intersector)
+        public override Point[] Intersections(Shape intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
         {
             if(intersector.GetType() == typeof(Circle))
             {
@@ -168,10 +168,14 @@ namespace SouthSaxon.Geometry
                 }
                 else if(distanceBetweenPoints.Measure() == (Radius + other.Radius))
                 {
-
+                    return new Point[] { distanceBetweenPoints.Trace(Center.X, Radius) };
+                }
+                else
+                {
+                    throw new NotImplementedException(); //How do I get multiple points of intersection?
                 }
             }
-            throw new NotImplementedException();
+            throw new NotImplementedException(); //How do I intersect with other types of shapes?
         }
 
         /* ROTATION DICTIONARY */
@@ -184,17 +188,46 @@ namespace SouthSaxon.Geometry
 
     public class Ellipse : Shape
     {
+        private Point firstFoci;
+        private Point secondFoci;
+
+        public Point FirstFoci
+        {
+            get
+            {
+                return firstFoci;
+            }
+
+            set
+            {
+                firstFoci = value;
+            }
+        }
+
+        public Point SecondFoci
+        {
+            get
+            {
+                return secondFoci;
+            }
+
+            set
+            {
+                secondFoci = value;
+            }
+        }
+
         public override double Area()
         {
             throw new NotImplementedException();
         }
 
-        public override Point[] Intersections(Shape intersectors)
+        public override Point[] Intersections(Shape intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
         {
             throw new NotImplementedException();
         }
 
-        public override Point[] Intersections(Line intersector)
+        public override Point[] Intersections(Line intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
         {
             throw new NotImplementedException();
         }
@@ -227,27 +260,40 @@ namespace SouthSaxon.Geometry
     {
         private Corner[] corners;
 
+        public virtual Corner[] Corners
+        {
+            get
+            {
+                return corners;
+            }
+
+            set
+            {
+                corners = value;
+            }
+        }
+
         /// <summary>
         /// The number of corners, or sides, in a polygon.
         /// </summary>
         /// <returns>The number of corners, or sides, in a shape.</returns>
         public int sides()
         {
-            return corners.Length;
+            return Corners.Length;
         }
 
         /// <summary>
         /// Returns the line segments which make up the polygon's perimeter
         /// </summary>
         /// <returns></returns>
-        public Line[] LineConnectors()
+        public LineSegment[] LineConnectors()
         {
-            Line[] borders = new Line[sides()];
+            LineSegment[] borders = new LineSegment[sides()];
             for (int i = 0; i < sides() - 1; i++)
             {
-                borders[i] = new LineSegment(corners[i], corners[i + 1]);
+                borders[i] = new LineSegment(Corners[i], Corners[i + 1]);
             }
-            borders[sides() - 1] = new LineSegment(corners[0], corners[sides() - 1]);
+            borders[sides() - 1] = new LineSegment(Corners[0], Corners[sides() - 1]);
             return borders;
         }
 
@@ -296,9 +342,15 @@ namespace SouthSaxon.Geometry
             return false;
         }
 
-        public override Point[] Intersections(Shape intersector)
+        public override Point[] Intersections(Shape intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
         {
-            throw new NotImplementedException();
+            List<Point> intersectionPoints = new List<Point>();
+            Line[] myBorders = LineConnectors();
+            foreach (Line oneOfMyBorders in myBorders)
+            {
+                intersectionPoints.AddRange(intersector.Intersections(oneOfMyBorders, recordInfiniteIntersection, recordNoIntersection));
+            }
+            return intersectionPoints.ToArray();
         }
 
         /// <summary>
@@ -309,7 +361,7 @@ namespace SouthSaxon.Geometry
         /// <param name="recordInfiniteIntersection">Whether or not to return a placeholder point with NaN for values when there is no intersection between a border and the line.</param>
         /// <param name="recordNoIntersection">Whether or not to return a placeholder point to represent perfectly adjacent parallel lines.</param>
         /// <returns>All of the intersections between this shape and the line.</returns>
-        public Point[] Intersections(Line intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
+        public override Point[] Intersections(Line intersector, bool recordInfiniteIntersection = true, bool recordNoIntersection = false)
         {
             Line[] myBorders = LineConnectors();
             List<Point> intersectionPoints = new List<Point>();
@@ -327,23 +379,52 @@ namespace SouthSaxon.Geometry
             return intersectionPoints.ToArray();
         }
 
-        /// <see cref="Intersections(Line, bool, bool)"/>
-        public override Point[] Intersections(Line intersector)
-        {
-            return Intersections(intersector, true, false);
-        }
+        public abstract void UpdateAngles(); //This is necessary because people might not knowt the angles of the points which they pass into these shapes; we'll have to calculate them automatically.
 
+        /// <summary>
+        /// Adds together all of the angles in the polygon.
+        /// </summary>
+        /// <returns>The total interior angle sum of the polygon.</returns>
         public int InteriorAngleSum()
         {
             return 180 * (sides() - 2);
         }
-
-        //InteriorAngle() is not necessarily a good thing to mandate because not all shapes will be equalateral
     }
 
     //TODO: Add trigonometry to the triangle class!
     public class Triangle : Polygon
     {
+        public override Corner[] Corners
+        {
+            get
+            {
+                return base.Corners;
+            }
+
+            set //This is weird because we can't have less or more than three points in a triangle.
+            {
+                Corner[] sanValue = new Corner[3]; //Ew magic number
+                for(int i = 0; i < sanValue.Length; i++)
+                {
+                    if(i<value.Length)
+                    {
+                        sanValue[i] = value[i];
+                    }
+                    else
+                    {
+                        sanValue[i] = new Corner(); //Just use whatever the default corner value is, I guess. Everything's gone to hell if this is called anyway.
+                        //Throw exception?
+                    }
+                }
+                base.Corners = sanValue;
+            }
+        }
+
+        public Triangle(Corner[] endpoints)
+        {
+            Corners = endpoints;
+        }
+
         public override double Area()
         {
             throw new NotImplementedException();
@@ -351,17 +432,79 @@ namespace SouthSaxon.Geometry
 
         public override Shape Reflect(Line mirror)
         {
-            throw new NotImplementedException();
+            Corner[] newLocation = new Corner[Corners.Length]; //Corners.Length should always be 3, but you never know!
+            for(int i = 0; i < Corners.Length; i++)
+            {
+                newLocation[i] = Corners[i].Reflect(mirror);
+            }
+            return new Triangle(newLocation);
         }
 
         public override Shape Rotate(Point origin, double radians)
         {
-            throw new NotImplementedException();
+            Corner[] newLocation = new Corner[Corners.Length]; //Corners.Length should always be 3, but you never know!
+            for (int i = 0; i < Corners.Length; i++)
+            {
+                newLocation[i] = Corners[i].Rotate(origin, radians);
+            }
+            return new Triangle(newLocation);
+        }
+
+        public override void UpdateAngles()
+        {
+            //Get all the lines
+            //Point 1 = line 1 to 2 and n to 1
+            //Otherwise point 2 is 1 to 2 and 2 to 3, so on and so forth.
+            //This will be done with law of cosines.
+            /*
+             * LAW OF COSINES
+             * c^2 = a^2 + b^2 - 2*a*b*cos(C)
+             * 2abcos(C) = a^2 + b^2 - c^2
+             * cos(C) = (a^2 + b^2 - c^2) / (2ab)
+             */
+            LineSegment[] myBorders = LineConnectors();
+            double a = myBorders[1].Measure(); //Opposite of BC
+            double b = myBorders[2].Measure();
+            double c = myBorders[0].Measure();
+            Corners[0].Angle = Math.Acos(((b * b) + (c * c) - (a * a)) / (2 * b * c));
+            Corners[1].Angle = Math.Acos(((a * a) + (c * c) - (b * b)) / (2 * a * c));
+            Corners[2].Angle = Math.Acos(((b * b) + (a * a) - (c * c)) / (2 * b * a));
         }
     }
 
     public class Quadrilateral : Polygon
     {
+        public override Corner[] Corners
+        {
+            get
+            {
+                return base.Corners;
+            }
+
+            set //This is weird because we can't have less or more than three points in a triangle.
+            {
+                Corner[] sanValue = new Corner[4]; //Another magic number
+                for (int i = 0; i < sanValue.Length; i++)
+                {
+                    if (i < value.Length)
+                    {
+                        sanValue[i] = value[i];
+                    }
+                    else
+                    {
+                        sanValue[i] = new Corner(); //Just use whatever the default corner value is, I guess. Everything's gone to hell if this is called anyway.
+                        //Throw exception?
+                    }
+                }
+                base.Corners = sanValue;
+            }
+        }
+
+        public Quadrilateral(Corner[] endpoints)
+        {
+            Corners = endpoints;
+        }
+
         public override double Area()
         {
             throw new NotImplementedException();
@@ -369,12 +512,29 @@ namespace SouthSaxon.Geometry
 
         public override Shape Reflect(Line mirror)
         {
-            throw new NotImplementedException();
+            Corner[] newLocation = new Corner[Corners.Length]; //Corners.Length should always be 3, but you never know!
+            for (int i = 0; i < Corners.Length; i++)
+            {
+                newLocation[i] = Corners[i].Reflect(mirror);
+            }
+            return new Quadrilateral(newLocation);
         }
 
         public override Shape Rotate(Point origin, double radians)
         {
-            throw new NotImplementedException();
+            Corner[] newLocation = new Corner[Corners.Length]; //Corners.Length should always be 3, but you never know!
+            for (int i = 0; i < Corners.Length; i++)
+            {
+                newLocation[i] = Corners[i].Rotate(origin, radians);
+            }
+            return new Quadrilateral(newLocation);
         }
+
+        public override void UpdateAngles()
+        {
+            throw new NotImplementedException();
+            //See and use the one in triangle.
+        }
+        
     }
 }

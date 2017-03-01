@@ -42,7 +42,11 @@ namespace TestProgram
             Console.WriteLine(corner1.Reflect(mirror));
 
             Console.ReadLine();
-
+            Console.WriteLine("I have a triangle!");
+            Corner[] corners = new Corner[] { new Corner(0, 0), new Corner(0, 10), new Corner(10, 0) };
+            Triangle myTriangle = new Triangle(corners);
+            myTriangle.UpdateAngles();
+            Console.WriteLine("90 degrees is " + (myTriangle.Corners[0].Angle/Math.PI) + " radians!");
             
 
             //This comment is an example change to test commits: Everything's working!

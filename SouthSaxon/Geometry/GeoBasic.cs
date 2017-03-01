@@ -164,6 +164,12 @@ namespace SouthSaxon.Geometry
             return new Corner(reflected, Angle);
         }
 
+        public new Corner Rotate(Point origin, double radians)
+        {
+            Point rotated = base.Rotate(origin, radians);
+            return new Corner(rotated, Angle);
+        }
+
         public override string ToString()
         {
             return "(" + X + "," + Y + ") " + angle + " radians";
