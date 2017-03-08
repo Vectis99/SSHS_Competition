@@ -13,7 +13,7 @@ namespace TestProgram
     {
         static void Main(String[] args)
         {
-            ExampleProblems.
+            ExampleProblems.prefixNotation("2 3 4 5 + * +");
         }
 
         public static int sumTo(int sumFrom)

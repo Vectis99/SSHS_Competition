@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SouthSaxon
 {
-    class ExampleProblems
+    public class ExampleProblems
     {
         /// <summary>
         /// 2011 Problem 1
