@@ -210,10 +210,35 @@ namespace SouthSaxon
          * Oh, regular expressions, my old friend.
          * System.Text.RegularExpressions.Regex.IsMatch
          */
+         /// <summary>
+         /// Checks to see if a given string matches certain criteria
+         /// </summary>
+         /// <param name="item">The string to examine</param>
+         /// <param name="regex">The criteria to test the string against</param>
+         /// <returns>Whether or not the string is valid according to the regex</returns>
         public static bool ValidateInputItem(string item, string regex)
          {
             return System.Text.RegularExpressions.Regex.IsMatch(item, regex);
          }
+
+        /// <summary>
+        /// Checks to see if every string in an array passes a regular expression test.
+        /// </summary>
+        /// <param name="items">The strings to validate.</param>
+        /// <param name="regex">What constitutes a valid string.</param>
+        /// <returns>Whether or not every single item in the list was valid.</returns>
+        public static bool ValidateInputItem(string[] items, string regex)
+        {
+            bool allValid = true;
+            foreach(string indTest in items)
+            {
+                if(!ValidateInputItem(indTest, regex))
+                {
+                    allValid = false;
+                }
+            }
+            return allValid;
+        }
 
         /*
          * OTHER
@@ -265,6 +290,7 @@ namespace SouthSaxon
             return false;
         }
 
+
     }
 
     /// <summary>
@@ -284,5 +310,7 @@ namespace SouthSaxon
         public static string MATH_OPERATION = "([+,\\-,*,/,(,),^,%]|([0-9]*\\.[0-9]+)|([0-9]+))+";
         public static string PRECURSOR_TOKEN = "([A-Z]|[a-z]){1}[0-9]+";
         public static string POSTCURSOR_TOKEN = "[0-9]+([A-Z]|[a-z]){1}"; //I don't think postcursor is a word but don't tell anyone.
+        public static string DOUBLEFRACTION = "(([0 - 9] *\\.[0-9]+)|([0-9]+))\\/(([0-9]*\\.[0-9]+)|([0-9]+))";
+        public static string FRACTION = "(([0-9]+))\\/(([0-9]+))";
     }
 }
