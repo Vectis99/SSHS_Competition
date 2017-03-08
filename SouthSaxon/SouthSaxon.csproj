@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseConverter.cs" />
+    <Compile Include="ExampleProblems.cs" />
     <Compile Include="geometry\GeoBasic.cs" />
     <Compile Include="geometry\Shapes.cs" />
     <Compile Include="IO.cs" />
