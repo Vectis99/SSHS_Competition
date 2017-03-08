@@ -284,5 +284,7 @@ namespace SouthSaxon
         public static string MATH_OPERATION = "([+,\\-,*,/,(,),^,%]|([0-9]*\\.[0-9]+)|([0-9]+))+";
         public static string PRECURSOR_TOKEN = "([A-Z]|[a-z]){1}[0-9]+";
         public static string POSTCURSOR_TOKEN = "[0-9]+([A-Z]|[a-z]){1}"; //I don't think postcursor is a word but don't tell anyone.
+        public static string DOUBLEFRACTION = "(([0 - 9] *\\.[0-9]+)|([0-9]+))\\/(([0-9]*\\.[0-9]+)|([0-9]+))";
+        public static string FRACTION = "(([0-9]+))\\/(([0-9]+))";
     }
 }
