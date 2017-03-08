@@ -135,6 +135,42 @@ namespace SouthSaxon
                 return sumFrom;
             else
                 return sumFrom + sumTo(sumFrom - 1);
+                }
+
+        /// <summary>
+        /// 2010 Problem 1
+        /// </summary>
+        public static int postfixNotation(String input)
+        {
+            List<string> storeList = new List<string>();
+            List<string> inList = input.Split(' ').ToList();
+            foreach (string toStore in inList)
+            {
+                int storeSize = storeList.Count();
+                switch (toStore[0])
+                {
+                    case '+':
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) + int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList.RemoveAt(storeSize - 1);
+                        break;
+                    case '-':
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) - int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList.RemoveAt(storeSize - 1);
+                        break;
+                    case '*':
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) * int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList.RemoveAt(storeSize - 1);
+                        break;
+                    case '/':
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) / int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList.RemoveAt(storeSize - 1);
+                        break;
+                    default:
+                        storeList.Add(toStore);
+                        break;
+                }
+            }
+            return int.Parse(storeList[0]);
         }
 
     }
