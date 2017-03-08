@@ -35,7 +35,7 @@ namespace SouthSaxon
         /// <summary>
         /// 2010 Problem 1
         /// </summary>
-        public static void prefixNotation(String input)
+        public static int postfixNotation(String input)
         {
             List<string> storeList = new List<string>();
             List<string> inList = input.Split(' ').ToList();
@@ -65,8 +65,7 @@ namespace SouthSaxon
                         break;
                 }
             }
-            Console.WriteLine(storeList[0]);
-            Console.ReadLine();
+            return int.Parse(storeList[0]);
         }
     }
 }
