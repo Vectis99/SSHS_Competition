@@ -37,9 +37,13 @@ namespace SouthSaxon
         /// </summary>
         public static int postfixNotation(String input)
         {
+            List<string> list = input.Split(' ').ToList();
+            return postfixNotation(list);
+        }
+        public static int postfixNotation(List<string> list)
+        {
             List<string> storeList = new List<string>();
-            List<string> inList = input.Split(' ').ToList();
-            foreach (string toStore in inList)
+            foreach (string toStore in list)
             {
                 int storeSize = storeList.Count();
                 switch (toStore[0])
@@ -66,6 +70,13 @@ namespace SouthSaxon
                 }
             }
             return int.Parse(storeList[0]);
+        }
+        public static int prefixNotation(String input)
+        {
+            List<string> list = input.Split(' ').ToList();
+            list.Reverse();
+            return postfixNotation(list);
+            //Doesn't work with subtraction and division because of the position of numbers after reverse of list.
         }
     }
 }

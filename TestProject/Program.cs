@@ -13,7 +13,8 @@ namespace TestProgram
     {
         static void Main(String[] args)
         {
-
+            Console.WriteLine(ExampleProblems.prefixNotation("× − 5 6 7"));
+            Console.ReadLine();
         }
 
         public static int sumTo(int sumFrom)
