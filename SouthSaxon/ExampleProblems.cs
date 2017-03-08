@@ -124,20 +124,6 @@ namespace SouthSaxon
         }
 
         /// <summary>
-        /// Like a factorial but with addition, also known as triangle numbers.
-        /// I'm just putting this here because I'm too lazy to find a proper home for it. :(
-        /// </summary>
-        /// <param name="sumFrom">The number to collect the sum/factorial/thing of.</param>
-        /// <returns>The triangle number of this integer</returns>
-        public static int sumTo(int sumFrom)
-        {
-            if (sumFrom == 0)
-                return sumFrom;
-            else
-                return sumFrom + sumTo(sumFrom - 1);
-                }
-
-        /// <summary>
         /// 2010 Problem 1
         /// </summary>
         public static int postfixNotation(String input)
