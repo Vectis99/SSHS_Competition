@@ -11,14 +11,19 @@ namespace TestProgram
 {
     public class Program
     {
-        //Find example problems:
-        //https://drive.google.com/drive/folders/0B3jUhu-NdWs0ZGZ1WHJoYkhmRVU
         static void Main(String[] args)
         {
-            ExampleProblems.fractionSubtraction();
+            Console.WriteLine(ExampleProblems.prefixNotation("× − 5 6 7"));
+            Console.ReadLine();
         }
 
-        
+        public static int sumTo(int sumFrom)
+        {
+            if (sumFrom == 0)
+                return sumFrom;
+            else
+                return sumFrom + sumTo(sumFrom - 1);
+        }
 
     }
 }

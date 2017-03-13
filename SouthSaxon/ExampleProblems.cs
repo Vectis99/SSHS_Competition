@@ -128,27 +128,60 @@ namespace SouthSaxon
         /// </summary>
         public static int postfixNotation(String input)
         {
+            List<string> list = input.Split(' ').ToList();
+            return postfixNotation(list);
+        }
+        public static int postfixNotation(List<string> list)
+        {
+            return polishNotations(list, true);
+            //Is this useless? Why did I put this here? Same for the prefixNotation(List<string> list) as well.
+        }
+        public static int prefixNotation(String input)
+        {
+            List<string> list = input.Split(' ').ToList();
+            return prefixNotation(list);
+            //Doesn't work with subtraction and division because of the position of numbers after reverse of list.
+            //Hopefully fixed with the polishNotations but not tested yet
+        }
+        public static int prefixNotation(List<string> list)
+        {
+            return polishNotations(list.Reverse(), false);
+        }
+        public static int polishNotations(List<string> list, boolean reverse)
+        {
+            //reverse = postfix !reverse = prefix aka the original code before the polishNotations was added
             List<string> storeList = new List<string>();
-            List<string> inList = input.Split(' ').ToList();
-            foreach (string toStore in inList)
+            int pos1 = 0;
+            int pos2 = 0;
+            if (!reverse)
+            {
+                pos1 = 1;
+                pos2 = 2;
+            }
+            else
+            {
+                pos1 = 2;
+                pos2 = 1;
+            }
+            foreach (string toStore in list)
             {
                 int storeSize = storeList.Count();
                 switch (toStore[0])
                 {
                     case '+':
-                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) + int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - pos1]) + int.Parse(storeList[storeSize - pos2])).ToString();
                         storeList.RemoveAt(storeSize - 1);
                         break;
                     case '-':
-                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) - int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - pos1]) - int.Parse(storeList[storeSize - pos2])).ToString();
                         storeList.RemoveAt(storeSize - 1);
                         break;
                     case '*':
-                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) * int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - pos1]) * int.Parse(storeList[storeSize - pos2])).ToString();
                         storeList.RemoveAt(storeSize - 1);
                         break;
                     case '/':
-                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - 2]) / int.Parse(storeList[storeSize - 1])).ToString();
+                        storeList[storeSize - 2] = (int.Parse(storeList[storeSize - pos1]) / int.Parse(storeList[storeSize - pos2])).ToString();
                         storeList.RemoveAt(storeSize - 1);
                         break;
                     default:
@@ -158,6 +191,4 @@ namespace SouthSaxon
             }
             return int.Parse(storeList[0]);
         }
-
-    }
 }
